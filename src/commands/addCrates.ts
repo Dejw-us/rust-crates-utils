@@ -7,11 +7,47 @@ const SEARCH_URL = "https://crates.io/api/v1/crates";
 const addCrates = commands.registerCommand(
   "rust-crates-utils.AddCrates",
   async () => {
-    const crateToAdd = await showCrateQuickPick();
+    const crateName = await showCrateQuickPick();
+
+    if (!crateName) {
+      return;
+    }
+
+    const crate = await fetchCrate(crateName);
+
+    console.log(crate.crate.max_version);
+
+    const version = await window.showQuickPick([
+      { label: "default" },
+      ...crate.versions
+        .filter((v) => v.num !== crate.crate.max_version)
+        .map(mapVersions),
+    ]);
+
+    if (!version) {
+      return;
+    }
+
     const terminal = window.createTerminal("Addind crates");
-    terminal.sendText(`cargo add ${crateToAdd}`);
+
+    console.log(version);
+
+    if (version.label === "default") {
+      terminal.sendText(`cargo add ${crateName}`);
+    } else {
+      terminal.sendText(`cargo add ${crateName}@${version.label}`);
+    }
   }
 );
+
+function mapVersions(version: CrateVersion) {
+  return { label: version.num };
+}
+
+async function fetchCrate(crate: string): Promise<Crate> {
+  const response = await axios.get(`${SEARCH_URL}/${crate}`);
+  return response.data;
+}
 
 async function showCrateQuickPick() {
   const summary = await fetchSummary();
@@ -77,6 +113,20 @@ type CratesSummary = {
   just_updated: CrateInfo[];
   popular_keywords: Keyword[];
   popular_categories: CrateInfo[];
+};
+
+type Crate = {
+  crate: CrateData;
+  versions: CrateVersion[];
+};
+
+type CrateData = {
+  max_version: string;
+};
+
+type CrateVersion = {
+  crate: string;
+  num: string;
 };
 
 type CrateSearch = {
