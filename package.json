@@ -1,7 +1,13 @@
 {
   "name": "rust-crates-utils",
+  "icon": "icon.png",
   "displayName": "Rust Crates Utils",
-  "description": "",
+  "publisher": "dejwus",
+  "description": "This extension helps you manage your rust crates",
+  "repository": {
+    "url": "https://github.com/Dejw-us/rust-crates-utils",
+    "type": "github"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
