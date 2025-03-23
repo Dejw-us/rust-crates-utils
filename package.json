@@ -15,7 +15,8 @@
     "commands": [
       {
         "command": "rust-crates-utils.AddCrates",
-        "title": "Add Crates"
+        "title": "Add Crates",
+        "category": "Cargo"
       }
     ]
   },

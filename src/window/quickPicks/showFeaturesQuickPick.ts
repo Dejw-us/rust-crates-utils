@@ -7,22 +7,32 @@ async function showFeaturesQuickPick(
 
   while (true) {
     const input = await window.showQuickPick(
-      ["finish", ...Object.keys(features)],
-      { placeHolder: "Select features (choose 'finish' to confirm)" }
+      [
+        {
+          label: "Add crate",
+          description: "Select this option to add crate to your cargo project",
+        },
+        ...Object.keys(features)
+          .filter((feature) => !selectedFeatures.includes(feature))
+          .map((key) => {
+            return {
+              label: key,
+            };
+          }),
+      ],
+      { placeHolder: "Select features (choose 'Add crate' to confirm)" }
     );
 
-    if (!input) {
-      continue;
+    if (!input || input.label === "Add crate") {
+      break;
     }
 
-    if (input === "finish") {
-      return selectedFeatures;
-    }
-
-    if (!selectedFeatures.includes(input)) {
-      selectedFeatures.push(input);
+    if (!selectedFeatures.includes(input.label)) {
+      selectedFeatures.push(input.label);
     }
   }
+
+  return selectedFeatures;
 }
 
 export { showFeaturesQuickPick };

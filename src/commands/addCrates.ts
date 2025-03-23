@@ -1,6 +1,7 @@
-import { commands } from "vscode";
-import { cargoAdd } from "../cargo/cargo";
+import { commands, window } from "vscode";
+import { cargoAdd, findCargoProjects } from "../cargo/cargo";
 import { getCrate } from "../requests/crate";
+import { showCargoProjectsQuickPick } from "../window/quickPicks/showCargoProjectsQuickPick";
 import { showCrateQuickPick } from "../window/quickPicks/showCrateQuickPick";
 import { showFeaturesQuickPick } from "../window/quickPicks/showFeaturesQuickPick";
 import { showVersionQuickPick } from "../window/quickPicks/showVersionQuickPick";
@@ -25,8 +26,18 @@ const addCrates = commands.registerCommand(
     }
 
     const features = await showFeaturesQuickPick(crate.versions[0].features);
+    const projects = await findCargoProjects();
+    const cargoProject = await showCargoProjectsQuickPick(projects);
 
-    cargoAdd(crateName, version, features);
+    if (!cargoProject) {
+      return;
+    }
+
+    window.showInformationMessage(
+      `Adding crate to ${cargoProject?.name} project`
+    );
+
+    cargoAdd(cargoProject, crateName, version, features);
   }
 );
 
